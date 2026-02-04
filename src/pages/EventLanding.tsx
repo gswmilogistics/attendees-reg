@@ -137,7 +137,7 @@ export default function EventLanding() {
     [summaryRows]
   );
 
- 
+  const dayKey = tab === "total" ? "day1" : tab; // safe default for types
   const daySlots = tab === "total" ? [] : DAY_SLOTS[tab];
 
   return (
