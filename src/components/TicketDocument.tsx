@@ -31,7 +31,8 @@ const TicketDocument = forwardRef<HTMLDivElement, TicketProps>(({ order, event }
 
   return (
     <div ref={ref} style={{ fontFamily: 'sans-serif', width: '600px', backgroundColor: '#fff' }}>
-      {/* Header */}
+
+      {/* ── Header ── */}
       <div style={{ backgroundColor: '#0d1b2a', padding: '28px 32px', textAlign: 'center' }}>
         <div style={{ color: 'white', fontSize: '22px', fontWeight: 'bold', fontStyle: 'italic', marginBottom: '4px' }}>
           ╱GSWMI
@@ -42,13 +43,17 @@ const TicketDocument = forwardRef<HTMLDivElement, TicketProps>(({ order, event }
         <div style={{ color: 'white', fontSize: '20px', fontWeight: '600' }}>Event Ticket</div>
       </div>
 
-      {/* Attendee info */}
+      {/* ── Attendee info ── */}
       <div style={{ padding: '24px 32px', borderBottom: '1px solid #e5e7eb' }}>
-        <div style={{ marginBottom: '12px' }}>
+
+        {/* Event name */}
+        <div style={{ marginBottom: '10px' }}>
           <span style={{ fontSize: '13px', color: '#6b7280' }}>Event: </span>
           <span style={{ fontSize: '13px', color: '#3b5bdb', fontWeight: '600' }}>{event.name}</span>
         </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
+
+        {/* Order + Amount */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
           <span style={{ fontSize: '13px', color: '#6b7280' }}>
             Order #: <strong style={{ color: '#111' }}>{order.orderNumber}</strong>
           </span>
@@ -56,21 +61,37 @@ const TicketDocument = forwardRef<HTMLDivElement, TicketProps>(({ order, event }
             Amount paid: <strong style={{ color: '#111' }}>₦{order.totalAmount?.toLocaleString()}</strong>
           </span>
         </div>
+
+        {/* Date of purchase */}
+        <div style={{ marginBottom: '16px' }}>
+          <span style={{ fontSize: '13px', color: '#6b7280' }}>
+            Date of purchase: <strong style={{ color: '#111' }}>{formatDateTime(order.paidAt ?? order.createdAt)}</strong>
+          </span>
+        </div>
+
+        {/* Attendee details */}
         <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: '16px' }}>
           <div style={{ fontSize: '11px', fontWeight: '700', color: '#3b5bdb', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '10px' }}>
             Attendee
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-            <span style={{ fontSize: '13px', color: '#6b7280' }}>Name: <strong style={{ color: '#111' }}>{order.guest.firstName} {order.guest.lastName}</strong></span>
+            <span style={{ fontSize: '13px', color: '#6b7280' }}>
+              Name: <strong style={{ color: '#111' }}>{order.guest.firstName} {order.guest.lastName}</strong>
+            </span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span style={{ fontSize: '13px', color: '#6b7280' }}>Email: <strong style={{ color: '#111' }}>{order.guest.email}</strong></span>
-            <span style={{ fontSize: '13px', color: '#6b7280' }}>Phone: <strong style={{ color: '#111' }}>{order.guest.phone}</strong></span>
+            <span style={{ fontSize: '13px', color: '#6b7280' }}>
+              Email: <strong style={{ color: '#111' }}>{order.guest.email}</strong>
+            </span>
+            <span style={{ fontSize: '13px', color: '#6b7280' }}>
+              Phone: <strong style={{ color: '#111' }}>{order.guest.phone}</strong>
+            </span>
           </div>
         </div>
-      </div>
 
-      {/* One card per QR code */}
+      </div>{/* end attendee info */}
+
+      {/* ── One card per QR code ── */}
       {qrCodes.map((qr, i) => {
         const isMeal = qr.type === 'meal'
         const isTransport = qr.type === 'transport'
@@ -88,12 +109,12 @@ const TicketDocument = forwardRef<HTMLDivElement, TicketProps>(({ order, event }
 
         return (
           <div key={i} style={{
-            margin: '0 32px 24px',
+            margin: i === 0 ? '24px 32px 16px' : '0 32px 16px',
             border: '1px solid #e5e7eb',
             borderRadius: '8px',
             overflow: 'hidden',
-            marginTop: i === 0 ? '24px' : '0',
           }}>
+
             {/* Card header */}
             <div style={{ backgroundColor: headerColor, padding: '10px 16px' }}>
               <div style={{ color: 'white', fontSize: '12px', fontWeight: '700', letterSpacing: '1.5px' }}>
@@ -103,6 +124,8 @@ const TicketDocument = forwardRef<HTMLDivElement, TicketProps>(({ order, event }
 
             {/* Card body */}
             <div style={{ padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+
+              {/* Left: details */}
               <div style={{ flex: 1, paddingRight: '16px' }}>
 
                 {isMeal && (
@@ -157,9 +180,9 @@ const TicketDocument = forwardRef<HTMLDivElement, TicketProps>(({ order, event }
                   </>
                 )}
 
-              </div>
+              </div>{/* end left details */}
 
-              {/* QR code */}
+              {/* Right: QR code */}
               <div style={{ textAlign: 'center', flexShrink: 0 }}>
                 <div style={{ width: '110px', height: '110px', border: `3px solid ${headerColor}`, borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '6px', backgroundColor: '#fff' }}>
                   {qr.qrImage
@@ -173,18 +196,21 @@ const TicketDocument = forwardRef<HTMLDivElement, TicketProps>(({ order, event }
                   SCAN ME
                 </div>
                 <div style={{ fontSize: '9px', color: '#9ca3af', marginTop: '4px' }}>{qr.code}</div>
-              </div>
-            </div>
-          </div>
+              </div>{/* end right QR */}
+
+            </div>{/* end card body */}
+
+          </div>/* end card */
         )
       })}
 
-      {/* Footer */}
-      <div style={{ padding: '16px 32px', backgroundColor: '#f9fafb', borderTop: '1px solid #e5e7eb', textAlign: 'center' }}>
+      {/* ── Footer ── */}
+      <div style={{ padding: '16px 32px', marginTop: '8px', backgroundColor: '#f9fafb', borderTop: '1px solid #e5e7eb', textAlign: 'center' }}>
         <div style={{ fontSize: '10px', color: '#9ca3af' }}>
           Generated on {formatDateTime(order.paidAt ?? order.createdAt)} · GSWMI Event Management
         </div>
       </div>
+
     </div>
   )
 })

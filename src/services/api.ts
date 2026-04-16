@@ -198,3 +198,13 @@ export async function getOrderByNumber(orderNumber: string): Promise<OrderData> 
   const inner = (data as { success: boolean; data: { order: OrderData } }).data
   return (inner as { order: OrderData }).order ?? inner ?? data
 }
+
+export async function getAllEvents(): Promise<EventData[]> {
+  const data = await request<{ success: boolean; data: { events?: EventData[]; event?: EventData[] } | EventData[] }>('/events/')
+  const inner = (data as { success: boolean; data: unknown }).data ?? data
+  if (Array.isArray(inner)) return inner as EventData[]
+  const arr = (inner as { events?: EventData[]; event?: EventData[] }).events
+    ?? (inner as { event?: EventData[] }).event
+    ?? []
+  return arr
+}
