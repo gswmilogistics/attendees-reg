@@ -143,7 +143,9 @@ export interface OrderData {
     redeemed: boolean
   }[]
   paidAt?: string
-  createdAt: string
+  paid_at?: string
+  createdAt?: string
+  created_at?: string
 }
 
 export async function createOrder(payload: CreateOrderPayload): Promise<OrderData> {
