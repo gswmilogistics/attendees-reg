@@ -76,9 +76,42 @@ export default function EventPage() {
 
   if (notFound || !event) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-[#f5f5f3]">
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-[#f5f5f3] px-4">
+        <div className="text-[48px]">🔍</div>
         <p className="text-gray-700 text-[18px] font-semibold">Event not found</p>
-        <p className="text-gray-400 text-[14px]">The event you're looking for doesn't exist or has been removed.</p>
+        <p className="text-gray-400 text-[14px] text-center">The event you're looking for doesn't exist or has been removed.</p>
+        <button onClick={() => navigate('/')}
+          className="mt-2 px-6 py-2.5 bg-[#3b5bdb] text-white rounded-xl text-[14px] font-medium hover:bg-[#3451c7] transition-colors">
+          Go to home
+        </button>
+      </div>
+    )
+  }
+
+  // Past event guard
+  const isPast = event.endDate && new Date(event.endDate) < new Date()
+  if (isPast) {
+    return (
+      <div className="min-h-screen bg-[#f5f5f3] flex flex-col">
+        <Header />
+        <AnnouncementBanner />
+        <main className="flex-1 flex flex-col items-center justify-center gap-4 px-4">
+          {event.bannerUrl && !event.bannerUrl.startsWith('blob:') && (
+            <div className="w-full max-w-[500px] h-[160px] rounded-2xl overflow-hidden mb-2 shadow-sm">
+              <img src={event.bannerUrl} alt={event.name} className="w-full h-full object-cover" />
+            </div>
+          )}
+          <div className="text-[40px]">🎉</div>
+          <p className="text-[20px] font-bold text-[#0d1b2a] text-center">{event.name}</p>
+          <p className="text-[14px] text-gray-500 text-center max-w-[400px]">
+            This event has already taken place. Registration is now closed.
+          </p>
+          <button onClick={() => navigate('/')}
+            className="mt-2 px-6 py-2.5 bg-[#3b5bdb] text-white rounded-xl text-[14px] font-medium hover:bg-[#3451c7] transition-colors">
+            See upcoming events
+          </button>
+        </main>
+        <Footer />
       </div>
     )
   }
@@ -159,19 +192,43 @@ export default function EventPage() {
               </div>
               {event.location && (
                 <a href={getMapsUrl()} target="_blank" rel="noopener noreferrer"
-                  className="flex items-center gap-2 rounded-lg border border-gray-200 overflow-hidden hover:border-[#3b5bdb] transition-colors group">
-                  <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 group-hover:bg-blue-50 transition-colors">
-                    <MapPin size={13} className="text-[#3b5bdb] flex-shrink-0" />
-                    <span className="text-[13px] text-gray-700 font-medium">{event.location}</span>
-                  </div>
-                  <div className="flex-1 h-10 bg-[#e8eef4] hidden sm:flex items-center justify-center">
-                    <span className="text-[10px] text-gray-400">View on Maps</span>
-                  </div>
+                  className="flex items-center gap-2 px-3 py-2.5 rounded-lg border border-gray-200 bg-gray-50 hover:border-[#3b5bdb] hover:bg-blue-50 transition-colors group w-fit">
+                  <MapPin size={14} className="text-[#3b5bdb] flex-shrink-0" />
+                  <span className="text-[13px] text-gray-700 font-medium">{event.location}</span>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-400 group-hover:text-[#3b5bdb] transition-colors flex-shrink-0">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+                  </svg>
                 </a>
               )}
             </div>
           </div>
         </div>
+
+        {/* Guard: registration closed */}
+        {!event.registrationOpen && (
+          <div className="bg-red-50 border border-red-200 rounded-2xl px-6 py-5 mb-4 flex items-start gap-3">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-red-400 flex-shrink-0 mt-0.5">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            <div>
+              <p className="text-[14px] font-semibold text-red-700">Registration is currently closed</p>
+              <p className="text-[13px] text-red-500 mt-0.5">Ticket registration for this event is not open yet. Please check back later.</p>
+            </div>
+          </div>
+        )}
+
+        {/* Guard: no ticket types enabled */}
+        {event.registrationOpen && !hasMeal && !hasAccommodation && !hasTransport && (
+          <div className="bg-gray-50 border border-gray-200 rounded-2xl px-6 py-5 mb-4 flex items-start gap-3">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-400 flex-shrink-0 mt-0.5">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            <div>
+              <p className="text-[14px] font-semibold text-gray-700">No tickets available yet</p>
+              <p className="text-[13px] text-gray-500 mt-0.5">Ticket options for this event haven't been set up yet. Please check back soon.</p>
+            </div>
+          </div>
+        )}
 
         {/* Ticket sections */}
         <div className="flex flex-col gap-4 mb-8">
@@ -393,55 +450,111 @@ function DayContent({ day, mealGroups, quantities, onQty, onSelect }: {
   }
 
   return (
-    <div className="p-5 overflow-x-auto bg-white">
-      <table className="w-full min-w-[500px]">
-        <thead>
-          <tr className="border-b border-gray-100">
-            <th className="text-left text-[12px] text-gray-500 font-medium pb-3 w-24">Slot</th>
-            <th className="text-left text-[12px] text-gray-500 font-medium pb-3">Meal option × Price</th>
-            <th className="text-right text-[12px] text-gray-500 font-medium pb-3 whitespace-nowrap">Quantity (Max. 5 packs)</th>
-          </tr>
-        </thead>
-        <tbody>
-          {mealGroups.map((group) => {
-            const selected = quantities[day]?.[group.slot]
-            const qty = selected?.quantity ?? 0
-            const selectedIdx = selected?.optionIndex ?? 0
-            return (
-              <tr key={group.slot} className="border-b border-gray-50 last:border-0">
-                <td className="py-4 text-[13px] font-medium text-gray-800 capitalize align-top">{group.slot}</td>
-                <td className="py-4">
-                  {group.options.map((opt, i) => (
-                    <label key={i} className="flex items-center gap-2 mb-2 last:mb-0 cursor-pointer group">
-                      <input type="radio" name={`slot-${day}-${group.slot}`}
-                        checked={selected?.optionIndex === i}
-                        onChange={() => onSelect(day, group.slot, i)}
-                        className="accent-[#3b5bdb] w-4 h-4 flex-shrink-0" />
-                      <span className="text-[13px] text-gray-600 truncate max-w-[200px] group-hover:text-gray-900 transition-colors">{opt.name}</span>
-                      <span className="text-[12px] text-gray-400">–</span>
-                      <span className="text-[13px] text-gray-800 font-medium whitespace-nowrap">₦{opt.price.toLocaleString()}</span>
-                    </label>
-                  ))}
-                </td>
-                <td className="py-4 align-middle">
-                  <div className="flex items-center justify-end gap-3">
-                    <button onClick={() => onQty(day, group.slot, selectedIdx, -1)}
-                      className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors">
-                      <Minus size={12} />
-                    </button>
-                    <span className="text-[14px] font-medium w-4 text-center">{qty}</span>
-                    <button onClick={() => onQty(day, group.slot, selectedIdx, 1)}
-                      className="w-7 h-7 rounded-full border border-[#3b5bdb] text-[#3b5bdb] flex items-center justify-center hover:bg-blue-50 transition-colors">
-                      <Plus size={12} />
-                    </button>
-                    <span className="text-[12px] text-gray-400">packs</span>
-                  </div>
-                </td>
-              </tr>
-            )
-          })}
-        </tbody>
-      </table>
+    <div className="bg-white">
+      {/* Desktop: table layout */}
+      <div className="hidden md:block p-5 overflow-x-auto">
+        <table className="w-full min-w-[500px]">
+          <thead>
+            <tr className="border-b border-gray-100">
+              <th className="text-left text-[12px] text-gray-500 font-medium pb-3 w-24">Slot</th>
+              <th className="text-left text-[12px] text-gray-500 font-medium pb-3">Meal option × Price</th>
+              <th className="text-right text-[12px] text-gray-500 font-medium pb-3 whitespace-nowrap">Quantity (Max. 5 packs)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {mealGroups.map((group) => {
+              const selected = quantities[day]?.[group.slot]
+              const qty = selected?.quantity ?? 0
+              const selectedIdx = selected?.optionIndex ?? 0
+              return (
+                <tr key={group.slot} className="border-b border-gray-50 last:border-0">
+                  <td className="py-4 text-[13px] font-medium text-gray-800 capitalize align-top">{group.slot}</td>
+                  <td className="py-4">
+                    {group.options.map((opt, i) => (
+                      <label key={i} className="flex items-center gap-2 mb-2 last:mb-0 cursor-pointer group">
+                        <input type="radio" name={`slot-${day}-${group.slot}`}
+                          checked={selected?.optionIndex === i}
+                          onChange={() => onSelect(day, group.slot, i)}
+                          className="accent-[#3b5bdb] w-4 h-4 flex-shrink-0" />
+                        <span className="text-[13px] text-gray-600 truncate max-w-[200px] group-hover:text-gray-900 transition-colors">{opt.name}</span>
+                        <span className="text-[12px] text-gray-400">–</span>
+                        <span className="text-[13px] text-gray-800 font-medium whitespace-nowrap">₦{opt.price.toLocaleString()}</span>
+                      </label>
+                    ))}
+                  </td>
+                  <td className="py-4 align-middle">
+                    <div className="flex items-center justify-end gap-3">
+                      <button onClick={() => onQty(day, group.slot, selectedIdx, -1)}
+                        className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors">
+                        <Minus size={12} />
+                      </button>
+                      <span className="text-[14px] font-medium w-4 text-center">{qty}</span>
+                      <button onClick={() => onQty(day, group.slot, selectedIdx, 1)}
+                        className="w-7 h-7 rounded-full border border-[#3b5bdb] text-[#3b5bdb] flex items-center justify-center hover:bg-blue-50 transition-colors">
+                        <Plus size={12} />
+                      </button>
+                      <span className="text-[12px] text-gray-400">packs</span>
+                    </div>
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Mobile: card layout — no horizontal scrolling */}
+      <div className="md:hidden flex flex-col divide-y divide-gray-100">
+        {mealGroups.map((group) => {
+          const selected = quantities[day]?.[group.slot]
+          const qty = selected?.quantity ?? 0
+          const selectedIdx = selected?.optionIndex ?? 0
+          return (
+            <div key={group.slot} className="p-4">
+              {/* Slot label */}
+              <div className="text-[12px] font-bold text-[#3b5bdb] uppercase tracking-wide mb-3 capitalize">
+                {group.slot}
+              </div>
+              {/* Options */}
+              <div className="flex flex-col gap-2 mb-4">
+                {group.options.map((opt, i) => (
+                  <label key={i} onClick={() => onSelect(day, group.slot, i)}
+                    className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all ${
+                      selected?.optionIndex === i
+                        ? 'border-[#3b5bdb] bg-blue-50/60'
+                        : 'border-gray-200 bg-white'
+                    }`}>
+                    <div className="flex items-center gap-2">
+                      <div className={`w-4 h-4 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${
+                        selected?.optionIndex === i ? 'border-[#3b5bdb]' : 'border-gray-300'
+                      }`}>
+                        {selected?.optionIndex === i && <div className="w-2 h-2 rounded-full bg-[#3b5bdb]" />}
+                      </div>
+                      <span className="text-[13px] text-gray-700">{opt.name}</span>
+                    </div>
+                    <span className="text-[13px] font-semibold text-gray-800 whitespace-nowrap ml-2">₦{opt.price.toLocaleString()}</span>
+                  </label>
+                ))}
+              </div>
+              {/* Quantity row */}
+              <div className="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-3">
+                <span className="text-[13px] text-gray-600">Quantity <span className="text-[11px] text-gray-400">(max 5)</span></span>
+                <div className="flex items-center gap-4">
+                  <button onClick={() => onQty(day, group.slot, selectedIdx, -1)}
+                    className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 transition-colors">
+                    <Minus size={13} />
+                  </button>
+                  <span className="text-[16px] font-semibold text-gray-900 w-5 text-center">{qty}</span>
+                  <button onClick={() => onQty(day, group.slot, selectedIdx, 1)}
+                    className="w-8 h-8 rounded-full border border-[#3b5bdb] text-[#3b5bdb] flex items-center justify-center hover:bg-blue-50 transition-colors">
+                    <Plus size={13} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          )
+        })}
+      </div>
     </div>
   )
 }
