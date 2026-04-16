@@ -26,6 +26,11 @@ function capitalize(s: string) {
   return s.charAt(0).toUpperCase() + s.slice(1).replace(/_/g, ' ')
 }
 
+function getPurchaseDate(order: OrderData): string {
+  const raw = order.paidAt ?? order.paid_at ?? order.createdAt ?? order.created_at ?? ''
+  return raw ? formatDateTime(raw) : 'N/A'
+}
+
 const TicketDocument = forwardRef<HTMLDivElement, TicketProps>(({ order, event }, ref) => {
   const qrCodes = order.qrCodes ?? []
 
@@ -65,7 +70,7 @@ const TicketDocument = forwardRef<HTMLDivElement, TicketProps>(({ order, event }
         {/* Date of purchase */}
         <div style={{ marginBottom: '16px' }}>
           <span style={{ fontSize: '13px', color: '#6b7280' }}>
-            Date of purchase: <strong style={{ color: '#111' }}>{formatDateTime(order.paidAt ?? order.createdAt)}</strong>
+            Date of purchase: <strong style={{ color: '#111' }}>{getPurchaseDate(order)}</strong>
           </span>
         </div>
 
@@ -207,7 +212,7 @@ const TicketDocument = forwardRef<HTMLDivElement, TicketProps>(({ order, event }
       {/* ── Footer ── */}
       <div style={{ padding: '16px 32px', marginTop: '8px', backgroundColor: '#f9fafb', borderTop: '1px solid #e5e7eb', textAlign: 'center' }}>
         <div style={{ fontSize: '10px', color: '#9ca3af' }}>
-          Generated on {formatDateTime(order.paidAt ?? order.createdAt)} · GSWMI Event Management
+          Generated on {getPurchaseDate(order)} · GSWMI Event Management
         </div>
       </div>
 
