@@ -33,7 +33,7 @@ function NotFound() {
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/attendee-reg">
       <RegistrationProvider>
         <Routes>
           {/* Home — upcoming events list */}
